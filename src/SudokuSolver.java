@@ -1,6 +1,14 @@
 public class SudokuSolver {
-    private int size = 9; // default size
-    private int[][] board = new int[size][size]; // default board
+    private int size;
+    private int[][] board;
+
+    /**
+     * Default constructor for the SodukuSolver class that creates a 9x9 board
+     */
+    public SudokuSolver() {
+        this.size = 9;
+        this.board = generateBoard();
+    }
 
     /**
      * Constructor for the SodukuSolver class that takes a size and randomly generates a board
