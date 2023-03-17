@@ -1,5 +1,6 @@
 public class SudokuSolver {
     private int size;
+    private int sqrtSize;
     private int[][] board;
 
     /**
@@ -7,25 +8,39 @@ public class SudokuSolver {
      */
     public SudokuSolver() {
         this.size = 9;
+        this.sqrtSize = 3;
         this.board = generateBoard();
     }
 
     /**
      * Constructor for the SodukuSolver class that takes a size and randomly generates a board
      * @param size the size of the board (i.e., 1 - size numbers per row, column, and box)
+     * @throws IllegalArgumentException if the size is not a square
      */
     public SudokuSolver(int size) {
-        this.size = size;
-        this.board = generateBoard();
+        if (Math.sqrt(size) != (int) Math.sqrt(size)) {
+            throw new IllegalArgumentException("Size must be a square");
+        } else {
+            this.size = size;
+            this.sqrtSize = (int) Math.sqrt(size);
+            this.board = generateBoard();
+        }
     }
 
     /**
      * Constructor for the SodukuSolver class that takes a pre-generated board
      * @param board a square 2D array of integers representing the board
+     * @throws IllegalArgumentException if the board's length is not a square
      */
     public SudokuSolver(int[][] board) {
         this.board = board;
         this.size = board.length;
+
+        if (Math.sqrt(size) != (int) Math.sqrt(size)) {
+            throw new IllegalArgumentException("Size must be a square");
+        } else {
+            this.sqrtSize = (int) Math.sqrt(size);
+        }
     }
 
     /**
@@ -33,7 +48,8 @@ public class SudokuSolver {
      * Note: the board is not guaranteed to be solvable
      * @return a 2D array of integers representing a sudoku board
      */
-    private static int[][] generateBoard() {
+    private int[][] generateBoard() {
+
         return null;
     }
 
@@ -58,5 +74,13 @@ public class SudokuSolver {
      */
     private static boolean isSolved() {
         return false;
+    }
+
+    // MARK: - Helper methods for generateBoard
+    private int[][] generateSubMatrix() {
+        int[][] subMatrix = new int[this.sqrtSize][this.sqrtSize];
+
+
+        return subMatrix;
     }
 }
