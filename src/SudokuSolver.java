@@ -37,7 +37,7 @@ public class SudokuSolver {
         this.board = board;
         this.size = board.length;
 
-        if (Math.sqrt(size) != (int) Math.sqrt(size)) {
+        if (Math.sqrt(size) != (int) Math.sqrt(size) || board[0].length != size) {
             throw new IllegalArgumentException("Size of the board must be a square");
         } else {
             this.sqrtSize = (int) Math.sqrt(size);
@@ -107,9 +107,17 @@ public class SudokuSolver {
      * @return true if the board is solved with a valid solution, false otherwise
      */
     private boolean isValidSolution() {
-        return false;
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                if (this.board[i][j] != 0 && !isValidGuess(j, i, this.board[i][j])) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
+    // there may be an error here with the notUsedInBox method
     private boolean isValidGuess(int row, int col, int num) {
         return notUsedInRow(row, num) && notUsedInCol(col, num) && notUsedInBox(row - row % this.sqrtSize, col - col % this.sqrtSize, num);
     }
@@ -167,7 +175,7 @@ public class SudokuSolver {
     /**
      * A modified version of the Fisher-Yates shuffle algorithm that shuffles a 2D array
      * https://stackoverflow.com/questions/20190110/2d-int-array-shuffle
-     * @param a
+     * @param a a 2D array of integers representing a sub-matrix of a sudoku board
      */
     private int[][] shuffleSubMatrix(int[][] a) {
         Random random = new Random();
