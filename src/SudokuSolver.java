@@ -73,17 +73,17 @@ public class SudokuSolver {
         String outString = "";
 
         for (int i = 0; i < size; i++) {
-            if (i % size == 0) {
+            if (i % sqrtSize == 0) {
                 for (int j = 0; j <= 2 * (size + sqrtSize); j++) {
                     outString += "-";
                 }
                 outString += "\n";
             }
             for (int j = 0; j < size; j++) {
-                    if (j % size == 0) {
+                    if (j % sqrtSize == 0) {
                         outString += "| ";
                     }
-                    outString += board[i][j] + " ";
+                    outString += (board[i][j] == 0 ? " " : board[i][j]) + " ";
             }
             outString += "|\n";
         }
