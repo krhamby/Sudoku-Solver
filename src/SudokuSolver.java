@@ -50,7 +50,7 @@ public class SudokuSolver {
      * Note: the board is not guaranteed to be solvable
      * @return a 2D array of integers representing a sudoku board
      */
-    private int[][] generateBoard() {
+    private void generateBoard() {
         this.board = new int[this.size][this.size];
 
         // initialize the board to 0
@@ -64,8 +64,6 @@ public class SudokuSolver {
         for (int i = 0; i < this.size; i += this.sqrtSize) {
             fillSubMatrix(i, i);
         }
-
-        return board;
     }
 
     @Override
@@ -144,8 +142,8 @@ public class SudokuSolver {
         int[][] subMatrix = new int[this.sqrtSize][this.sqrtSize];
 
         int num = 1;
-        for (int i = rowStart; i < this.sqrtSize; i++) {
-            for (int j = colStart; j < this.sqrtSize; j++) {
+        for (int i = 0; i < this.sqrtSize; i++) {
+            for (int j = 0; j < this.sqrtSize; j++) {
                 subMatrix[i][j] = num;
                 num++;
             }
@@ -153,9 +151,9 @@ public class SudokuSolver {
 
         subMatrix = shuffleSubMatrix(subMatrix);
 
-        for (int i = rowStart; i < this.sqrtSize; i++) {
-            for (int j = colStart; j < this.sqrtSize; j++) {
-                this.board[i][j] = subMatrix[i][j];
+        for (int i = rowStart, k = 0; k < this.sqrtSize; i++, k++) {
+            for (int j = colStart, l = 0; l < this.sqrtSize; j++, l++) {
+                this.board[i][j] = subMatrix[k][l];
             }
         }
     }
@@ -182,6 +180,7 @@ public class SudokuSolver {
         return a;
     }
 
+    // MARK: - Main method for testing
     public static void main(String[] args) {
         // int[] testList = {1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7};
         // System.out.print(toStringTest(testList));
