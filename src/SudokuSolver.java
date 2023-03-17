@@ -106,8 +106,37 @@ public class SudokuSolver {
      * Checks if the sudoku board is solved with a valid solution
      * @return true if the board is solved with a valid solution, false otherwise
      */
-    private static boolean isSolved() {
+    private boolean isSolved() {
         return false;
+    }
+
+    private boolean notUsedInRow(int row, int num) {
+        for (int i = 0; i < this.size; i++) {
+            if (this.board[row][i] == num) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean notUsedInCol(int col, int num) {
+        for (int i = 0; i < this.size; i++) {
+            if (this.board[i][col] == num) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean notUsedInBox(int startRow, int startCol, int num) {
+        for (int i = startRow; i < this.sqrtSize; i++) {
+            for (int j = startCol; j < this.sqrtSize; j++) {
+                if (this.board[i][j] == num) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     // MARK: - Helper methods for generateBoard
