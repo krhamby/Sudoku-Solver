@@ -46,6 +46,7 @@ public class SudokuSolver {
 
     /**
      * Generates a random board with the size provided in the class constructor
+     * blanks are stored as 0
      * Note: the board is not guaranteed to be solvable
      * @return a 2D array of integers representing a sudoku board
      */
@@ -69,6 +70,12 @@ public class SudokuSolver {
 
     @Override
     public String toString() {
+        String outString = "";
+
+        for (int i = 0; i < size + sqrtSize; i++) {
+            
+        }
+
         return "";
     }
 
