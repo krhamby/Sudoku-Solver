@@ -10,7 +10,7 @@ public class SudokuSolver {
     public SudokuSolver() {
         this.size = 9;
         this.sqrtSize = 3;
-        this.board = generateBoard();
+        generateBoard();
     }
 
     /**
@@ -24,7 +24,7 @@ public class SudokuSolver {
         } else {
             this.size = size;
             this.sqrtSize = (int) Math.sqrt(size);
-            this.board = generateBoard();
+            generateBoard();
         }
     }
 
@@ -51,7 +51,7 @@ public class SudokuSolver {
      * @return a 2D array of integers representing a sudoku board
      */
     private int[][] generateBoard() {
-        int[][] board = new int[this.size][this.size];
+        this.board = new int[this.size][this.size];
 
         // initialize the board to 0
         for (int i = 0; i < this.size; i++) {
@@ -65,7 +65,7 @@ public class SudokuSolver {
             fillSubMatrix(i, i);
         }
 
-        return null;
+        return board;
     }
 
     @Override
@@ -141,11 +141,21 @@ public class SudokuSolver {
 
     // MARK: - Helper methods for generateBoard
     private void fillSubMatrix(int rowStart, int colStart) {
+        int[][] subMatrix = new int[this.sqrtSize][this.sqrtSize];
+
         int num = 1;
         for (int i = rowStart; i < this.sqrtSize; i++) {
             for (int j = colStart; j < this.sqrtSize; j++) {
-                this.board[i][j] = num;
+                subMatrix[i][j] = num;
                 num++;
+            }
+        }
+
+        subMatrix = shuffleSubMatrix(subMatrix);
+
+        for (int i = rowStart; i < this.sqrtSize; i++) {
+            for (int j = colStart; j < this.sqrtSize; j++) {
+                this.board[i][j] = subMatrix[i][j];
             }
         }
     }
@@ -155,7 +165,7 @@ public class SudokuSolver {
      * https://stackoverflow.com/questions/20190110/2d-int-array-shuffle
      * @param a
      */
-    private int[][] shuffle(int[][] a) {
+    private int[][] shuffleSubMatrix(int[][] a) {
         Random random = new Random();
     
         for (int i = a.length - 1; i > 0; i--) {
@@ -175,6 +185,7 @@ public class SudokuSolver {
     public static void main(String[] args) {
         // int[] testList = {1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7};
         // System.out.print(toStringTest(testList));
-
+        SudokuSolver test = new SudokuSolver();
+        System.out.print(test.toString());
     }
 }
