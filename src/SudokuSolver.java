@@ -3,6 +3,7 @@ public class SudokuSolver {
     private int size;
     private int sqrtSize;
     private int[][] board;
+    private int[][][] constraints;
 
     /**
      * Default constructor for the SodukuSolver class that creates a 9x9 board
@@ -41,6 +42,20 @@ public class SudokuSolver {
             throw new IllegalArgumentException("Size of the board must be a square");
         } else {
             this.sqrtSize = (int) Math.sqrt(size);
+        }
+
+        // initialize the constraints array
+        this.constraints = new int[this.size][this.size][this.size];
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                int num = 1;
+                for (int k = 0; k < this.size; k++) {
+                    if (isValidGuess(i, j, num)) {
+                        this.constraints[i][j][k] = num;
+                    }
+                    num++;
+                }
+            }
         }
     }
 
