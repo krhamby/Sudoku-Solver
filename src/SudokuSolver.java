@@ -92,33 +92,6 @@ public class SudokuSolver {
         return outString;
     }
 
-    // public static String toStringTest(int[] list) {
-    //     String outString = "";
-    //     int size = 16;
-    //     int sqrtSize = 4;
-
-    //     for (int i = 0; i < size; i++) {
-    //         if (i % sqrtSize == 0) {
-    //             for (int j = 0; j <= 2 * (size + sqrtSize); j++) {
-    //                 outString += "-";
-    //             }
-    //             outString += "\n";
-    //         }
-    //         for (int j = 0; j < size; j++) {
-    //                 if (j % sqrtSize == 0) {
-    //                     outString += "| ";
-    //                 }
-    //                 outString += list[j] + " ";
-    //         }
-    //         outString += "|\n";
-    //     }
-    //     for (int j = 0; j <= 2 * (size + sqrtSize); j++) {
-    //         outString += "-";
-    //     }
-
-    //     return outString;
-    // }
-
     /**
      * Attempts to solve the sudoku board using the AC3 algorithm with backtracking
      * @return true if the board is solved with a valid solution, false otherwise
