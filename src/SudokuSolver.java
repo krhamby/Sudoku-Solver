@@ -1,3 +1,4 @@
+import java.util.Random;
 public class SudokuSolver {
     private int size;
     private int sqrtSize;
@@ -37,7 +38,7 @@ public class SudokuSolver {
         this.size = board.length;
 
         if (Math.sqrt(size) != (int) Math.sqrt(size)) {
-            throw new IllegalArgumentException("Size must be a square");
+            throw new IllegalArgumentException("Size of the board must be a square");
         } else {
             this.sqrtSize = (int) Math.sqrt(size);
         }
@@ -49,6 +50,19 @@ public class SudokuSolver {
      * @return a 2D array of integers representing a sudoku board
      */
     private int[][] generateBoard() {
+        int[][] board = new int[this.size][this.size];
+
+        // initialize the board to 0
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                board[i][j] = 0;
+            }
+        }
+
+        // fill the indepent diagonal sub-matrices
+        for (int i = 0; i < this.size; i += this.sqrtSize) {
+            fillSubMatrix(i, i);
+        }
 
         return null;
     }
@@ -77,10 +91,35 @@ public class SudokuSolver {
     }
 
     // MARK: - Helper methods for generateBoard
-    private int[][] generateSubMatrix() {
-        int[][] subMatrix = new int[this.sqrtSize][this.sqrtSize];
+    private void fillSubMatrix(int rowStart, int colStart) {
+        int num = 1;
+        for (int i = rowStart; i < this.sqrtSize; i++) {
+            for (int j = colStart; j < this.sqrtSize; j++) {
+                this.board[i][j] = num;
+                num++;
+            }
+        }
+    }
 
+    /**
+     * A modified version of the Fisher-Yates shuffle algorithm that shuffles a 2D array
+     * https://stackoverflow.com/questions/20190110/2d-int-array-shuffle
+     * @param a
+     */
+    private int[][] shuffle(int[][] a) {
+        Random random = new Random();
+    
+        for (int i = a.length - 1; i > 0; i--) {
+            for (int j = a[i].length - 1; j > 0; j--) {
+                int m = random.nextInt(i + 1);
+                int n = random.nextInt(j + 1);
+    
+                int temp = a[i][j];
+                a[i][j] = a[m][n];
+                a[m][n] = temp;
+            }
+        }
 
-        return subMatrix;
+        return a;
     }
 }
