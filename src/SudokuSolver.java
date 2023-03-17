@@ -190,6 +190,8 @@ public class SudokuSolver {
     public static void main(String[] args) {
         // int[] testList = {1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7};
         // System.out.print(toStringTest(testList));
+        int[][] testBoard = {{1,2,3,6,7,8,9,4,5}, {5,8,4,2,3,9,7,6,1}, {9,6,7,1,4,5,3,2,8}, {4,5,6,7,8,9,1,2,3},
+         {5,6,7,8,9,1,2,3,4},{6,7,8,9,1,2,3,4,5},{7,8,9,1,2,3,4,5,6}, {8,9,1,2,3,4,5,6,7}, {}};
         SudokuSolver test = new SudokuSolver();
         System.out.print(test.toString());
     }
