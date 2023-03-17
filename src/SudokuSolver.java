@@ -37,12 +37,17 @@ public class SudokuSolver {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return "";
+    }
+
     /**
-     * Solves the sudoku board using the AC3 algorithm with backtracking
-     * @return a 2D array of integers representing a solved sudoku board; null if no solution exists
+     * Attempts to solve the sudoku board using the AC3 algorithm with backtracking
+     * @return true if the board is solved with a valid solution, false otherwise
      */
-    public int[][] solveUsingAC3WithBacktracking() {
-        return null;
+    public boolean solveUsingAC3WithBacktracking() {
+        return false;
     }
 
     // MARK: - Helper methods for AC3 with backtracking
