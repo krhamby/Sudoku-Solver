@@ -106,8 +106,12 @@ public class SudokuSolver {
      * Checks if the sudoku board is solved with a valid solution
      * @return true if the board is solved with a valid solution, false otherwise
      */
-    private boolean isSolved() {
+    private boolean isValidSolution() {
         return false;
+    }
+
+    private boolean isValidGuess(int row, int col, int num) {
+        return notUsedInRow(row, num) && notUsedInCol(col, num) && notUsedInBox(row - row % this.sqrtSize, col - col % this.sqrtSize, num);
     }
 
     private boolean notUsedInRow(int row, int num) {
