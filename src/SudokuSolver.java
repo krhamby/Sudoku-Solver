@@ -49,6 +49,7 @@ public class SudokuSolver {
             this.sqrtSize = (int) Math.sqrt(size);
         }
 
+        // TODO: perhaps extract this into a method
         // initialize the constraints array
         this.constraints = new ArrayList<ArrayList<ArrayList<Integer>>>(this.size);
 
@@ -76,6 +77,8 @@ public class SudokuSolver {
             }
         }
         
+        // TODO: perhaps extract this into a method
+        // initialize the queue
         this.queue = new LinkedList<Arc>();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -138,9 +141,27 @@ public class SudokuSolver {
      * @return true if the board is solved with a valid solution, false otherwise
      */
     public boolean solveUsingAC3WithBacktracking() {
-        
+        int count = 0;
+        while (!queue.isEmpty()) {
+            System.out.println("Iteration: " + count);
+            Arc arc = queue.remove();
+            int[] xiLocation = arc.getXiLocation();
+            int[] xjLocation = arc.getXjLocation();
 
-        return false;
+            ArrayList<Integer> xiDomList = constraints.get(xiLocation[0]).get(xiLocation[1]);
+            ArrayList<Integer> xjDomList = constraints.get(xjLocation[0]).get(xjLocation[1]);
+
+            count++;
+            if (revise(xiDomList, xjDomList)) {
+                if (xiDomList.isEmpty()) {
+                    return false;
+                }
+                ArrayList<Arc> arcs = getReversedAdjacentArcs(xiLocation[0], xiLocation[1]);
+                queue.addAll(arcs);
+            }
+        }
+
+        return true;
     }
 
     // MARK: - Helper methods for AC3 with backtracking
@@ -157,31 +178,60 @@ public class SudokuSolver {
         int startRow = ((int) (row / 3)) * 3;
         int startCol = ((int) (col / 3)) * 3;
 
-
-
-
-        for (int i = startRow; i < (startRow * 3) + sqrtSize; i++) {
-            for (int j = startCol; j < (startCol * 3) + sqrtSize; j++) {
+        for (int i = startRow; i < startRow + sqrtSize; i++) {
+            for (int j = startCol; j < startCol + sqrtSize; j++) {
                 if (row != i && j != col) {
                     arcList.add(new Arc(row, col, i, j));
                 }
             }
         }
         return arcList;
+    }   
+    
+    private ArrayList<Arc> getReversedAdjacentArcs(int row, int col) {
+        ArrayList<Arc> arcList = new ArrayList<Arc>();
+        for (int i = 0; i < size; i++ ) {
+            if (i != row) {
+                arcList.add(new Arc(i, col, row, col));
+            }
+            if (i != col) {
+                arcList.add(new Arc(row, i, row, col));
+            }
+        }
+        int startRow = ((int) (row / 3)) * 3;
+        int startCol = ((int) (col / 3)) * 3;
 
-    }    /*
-     * Revisethe domain of Xi, comparing with Xj
+        for (int i = startRow; i < startRow + sqrtSize; i++) {
+            for (int j = startCol; j < startCol + sqrtSize; j++) {
+                if (row != i && j != col) {
+                    arcList.add(new Arc(i, j, row, col)); // this is what's different
+                }
+            }
+        }
+        return arcList;
+    }
+    
+    /*
+     * Revise the domain of Xi, comparing with Xj
      * use arc to get these domains, then pass the domains in :) - Melva
      */
     private boolean revise(ArrayList<Integer> Xi, ArrayList<Integer> Xj) {
         boolean revised = false;
-        if (Xj.size() == 1) {
-            if (Xi.contains(Xj.get(0))) {
-                Xi.remove(Xj.get(0));
+        for (int i = 0; i < Xi.size(); i++) {
+            if (Xj.contains(Xi.get(i)) && Xi.size() > 1) {
+                Xi.remove(i);
                 revised = true;
             }
         }
         return revised;
+
+        // if (Xj.size() == 1) {
+        //     if (Xi.contains(Xj.get(0))) {
+        //         Xi.remove(Xj.get(0));
+        //         revised = true;
+        //     }
+        // }
+        // return revised;
     }
     /**
      * Checks if the sudoku board is solved with a valid solution
@@ -283,7 +333,9 @@ public class SudokuSolver {
          {3,7,2,4,6,1,5,8,9},{6,9,1,5,8,3,2,7,4},{4, 5,8,7,9,2,6,1,3}, {8,3,6,9,2,4,1,5,7}, {2,1,9,8,5,7,4,3,6},
         {7, 4,5,3,1,6,8,9,2}};
         SudokuSolver test = new SudokuSolver(completeBoard);
-        System.out.print(test.toString());
+        System.out.println(test.toString());
+        System.out.println(test.constraints);
+        System.out.println(test.solveUsingAC3WithBacktracking());
         System.out.println(test.constraints);
     }
 }
