@@ -1,7 +1,6 @@
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Queue;
 
 public class SudokuSolver {
     private int size;
@@ -67,18 +66,13 @@ public class SudokuSolver {
                 } else {
                     for (int k = 1; k <= this.size; k++) {
                         this.constraints.get(i).get(j).add(k);
-
-
-                        // if (isValidGuess(i, j, k)) {
-                        //     this.constraints.get(i).get(j).add(k);
-                        // }
                     }
                 }
             }
         }
-        
-        // TODO: perhaps extract this into a method
-        // initialize the queue
+    }
+
+    private void initializeQueue() {
         this.queue = new LinkedList<Arc>();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -136,14 +130,24 @@ public class SudokuSolver {
         return outString;
     }
 
+    public boolean equals(int[][] solutionBoard) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (board[i][j] != solutionBoard[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * Attempts to solve the sudoku board using the AC3 algorithm
      * @return true if the queue is empty, false otherwise
      */
     public boolean runAC3() {
-        int count = 0;
+        initializeQueue();
         while (!queue.isEmpty()) {
-            // System.out.println("Iteration: " + count);
             Arc arc = queue.remove();
             int[] xiLocation = arc.getXiLocation();
             int[] xjLocation = arc.getXjLocation();
@@ -151,7 +155,6 @@ public class SudokuSolver {
             ArrayList<Integer> xiDomList = constraints.get(xiLocation[0]).get(xiLocation[1]);
             ArrayList<Integer> xjDomList = constraints.get(xjLocation[0]).get(xjLocation[1]);
 
-            count++;
             if (revise(xiDomList, xjDomList)) {
                 if (xiDomList.isEmpty()) {
                     return false;
@@ -160,11 +163,10 @@ public class SudokuSolver {
                 queue.addAll(arcs);
             }
         }
-
         return true;
     }
 
-    public boolean runBacktrack() {
+    public boolean runBacktrackingWithAC3() {
         if (isValidSolution() && isComplete()) {
             return true;
         }
@@ -193,49 +195,47 @@ public class SudokuSolver {
         int col = var[1];
 
         ArrayList<Integer> domain = constraints.get(var[0]).get(var[1]);
-        for (int i = 0; i < domain.size(); i++) {
+        int domainSize = domain.size();
+        for (int i = 0; i < domainSize; i++) {
+            domain = constraints.get(var[0]).get(var[1]); // update domain since we changed memory location
             int value = domain.get(i);
             if (isValidGuess(row, col, value)) {
                 board[row][col] = value;
                 removeOtherValuesFromDomain(row, col, value);
                 boolean inference = runAC3();
-                // System.out.println("Inference: " + inference);
-                // System.out.println(this.constraints);
+
                 if (inference) {
-                    boolean result = runBacktrack();
+                    boolean result = runBacktrackingWithAC3();
                     if (result) {
                         return true;
                     }
                 }
-                // boolean result = runBacktrack();
-                // if (result) {
-                //     return true;
-                // }
             }
+
             // remove changes made to board and constraints on failure
-            this.board = boardCopy;
-            this.constraints = constraintsCopy;
+            this.board = new int[size][size];
+            for (int j = 0; j < size; j++) {
+                for (int k = 0; k < size; k++) {
+                    this.board[j][k] = boardCopy[j][k];
+                }
+            }
+
+            this.constraints = new ArrayList<ArrayList<ArrayList<Integer>>>(size);
+            for (int j = 0; j < size; j++) {
+                this.constraints.add(new ArrayList<ArrayList<Integer>>(size));
+                for (int k = 0; k < size; k++) {
+                    this.constraints.get(j).add(new ArrayList<Integer>());
+                    for (int l = 0; l < constraintsCopy.get(j).get(k).size(); l++) {
+                        this.constraints.get(j).get(k).add(constraintsCopy.get(j).get(k).get(l));
+                    }
+                }
+            }
         }
         return false;
     }
 
-    // this can probably be refined some -- do later in testing
     public boolean solve() {
-        // boolean ac3Succeeded = runAC3();
-        // if (ac3Succeeded && backtrackingNeeded()) {
-        //     return runBacktracking();
-        // } else if (ac3Succeeded) { // if ac3 succeeded and backtracking is not needed
-        //     assignRemainingValues();
-        //     if (isValidSolution()) {
-        //         return true;
-        //     } else {
-        //         return false;
-        //     }
-        // } else { // if ac3 failed
-        //     return ac3Succeeded;
-        // }
-
-        return runBacktrack();
+        return runBacktrackingWithAC3();
     }
 
     // MARK: - Helper methods for AC3
@@ -249,8 +249,8 @@ public class SudokuSolver {
                 arcList.add(new Arc(row, col, row, i));
             }
         }
-        int startRow = ((int) (row / 3)) * 3;
-        int startCol = ((int) (col / 3)) * 3;
+        int startRow = ((int) (row / sqrtSize)) * sqrtSize;
+        int startCol = ((int) (col / sqrtSize)) * sqrtSize;
 
         for (int i = startRow; i < startRow + sqrtSize; i++) {
             for (int j = startCol; j < startCol + sqrtSize; j++) {
@@ -290,15 +290,6 @@ public class SudokuSolver {
      * use arc to get these domains, then pass the domains in :) - Melva
      */
     private boolean revise(ArrayList<Integer> Xi, ArrayList<Integer> Xj) {
-        // boolean revised = false;
-        // for (int i = 0; i < Xi.size(); i++) {
-        //     if (Xj.contains(Xi.get(i)) && Xi.size() > 1) {
-        //         Xi.remove(i);
-        //         revised = true;
-        //     }
-        // }
-        // return revised;
-
         boolean revised = false;
         if (Xj.size() == 1) {
             if (Xi.contains(Xj.get(0))) {
@@ -307,27 +298,6 @@ public class SudokuSolver {
             }
         }
         return revised;
-    }
-
-    private boolean backtrackingNeeded() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (constraints.get(i).get(j).size() > 1) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void assignRemainingValues() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (board[i][j] == 0) {
-                    board[i][j] = constraints.get(i).get(j).get(0);
-                }
-            }
-        }
     }
 
     // MARK: - Helper methods for backtracking
@@ -348,11 +318,8 @@ public class SudokuSolver {
     }
 
     private void removeOtherValuesFromDomain(int row, int col, int value) {
-        for (int i = 0; i < constraints.get(row).get(col).size(); i++) {
-            if (constraints.get(row).get(col).get(i) != value) {
-                constraints.get(row).get(col).remove(i);
-            }
-        }
+        constraints.get(row).get(col).clear();
+        constraints.get(row).get(col).add(value);
     }
 
     /**
@@ -459,29 +426,38 @@ public class SudokuSolver {
     }
 
     // MARK: - Main method for testing
-    public static void main(String[] args) {
-        // int[] testList = {1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7};
-        // System.out.print(toStringTest(testList));
-        int[][] completeBoard = {{1,2,3,6,7,8,9,4,5}, {5,8,4,2,3,9,7,6,1}, {9,6,7,1,4,5,3,2,8},
-         {3,7,2,4,6,1,5,8,9},{6,9,1,5,8,3,2,7,4},{4, 5,8,7,9,2,6,1,3}, {8,3,6,9,2,4,1,5,7}, {2,1,9,8,5,7,4,3,6},
-        {7, 4,5,3,1,6,8,9,2}};
-        int[][] incompleteBoard = {{1,0,3,6,0,8,0,0, 5}, {0,0,4,2,0,9,0,6,1}, {9,6,7,1,4,5,3,2,8},
-         {3,7,2,4,0,1,0,8,0},{6,0,0,5,8,0,0,7,4},{4,5,8,7,0,0,0,1,0}, {8,3,6,0,2,0,1,5,7}, {2,0,9,8,0,7,4,3,6},
-        {7, 4,5,0,1,0,8,0,0}};
-        SudokuSolver complete = new SudokuSolver(completeBoard);
-        SudokuSolver test = new SudokuSolver(incompleteBoard);
-        System.out.println(test.solve());
-        // System.out.println(test.runAC3());
-        // System.out.println(test.constraints);
-        System.out.println(test);
+    // public static void main(String[] args) {
+    //     // int[] testList = {1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7};
+    //     // System.out.print(toStringTest(testList));
+    //     int[][] completeBoard = {{1,2,3,6,7,8,9,4,5}, {5,8,4,2,3,9,7,6,1}, {9,6,7,1,4,5,3,2,8},
+    //      {3,7,2,4,6,1,5,8,9},{6,9,1,5,8,3,2,7,4},{4, 5,8,7,9,2,6,1,3}, {8,3,6,9,2,4,1,5,7}, {2,1,9,8,5,7,4,3,6},
+    //     {7, 4,5,3,1,6,8,9,2}};
+    //     int[][] incompleteBoard = {{1,0,3,6,0,8,0,0, 5}, {0,0,4,2,0,9,0,6,1}, {9,6,7,1,4,5,3,2,8},
+    //      {3,7,2,4,0,1,0,8,0},{6,0,0,5,8,0,0,7,4},{4,5,8,7,0,0,0,1,0}, {8,3,6,0,2,0,1,5,7}, {2,0,9,8,0,7,4,3,6},
+    //     {7, 4,5,0,1,0,8,0,0}};
 
-        // compare the two boards
-        for (int i = 0; i < test.size; i++) {
-            for (int j = 0; j < test.size; j++) {
-                if (test.board[i][j] != completeBoard[i][j]) {
-                    System.out.println("Error at row " + i + " and column " + j);
-                }
-            }
-        }
-    }
+    //     // put this into a board: 000290605 097805040 500703900 000030100 602084030 053000008 006007003 005028010 009356800 
+    //     int[][] anotherBoard = {{0,0,0,2,9,0,6,0,5}, {0,9,7,8,0,5,0,4,0}, {5,0,0,7,0,3,9,0,0}, {0,0,0,0,3,0,1,0,0}, {6,0,2,0,8,4,0,3,0}, {0,5,3,0,0,0,0,0,8}, {0,0,6,0,0,7,0,0,3}, {0,0,5,0,2,8,0,1,0}, {0,0,9,3,5,6,8,0,0}};
+
+    //     // put this into a board: 384291675 297865341 561743982 978632154 612584739 453179268 826417593 735928416 149356827
+    //     int[][] anotherCompleteBoard = {{3,8,4,2,9,1,6,7,5}, {2,9,7,8,6,5,3,4,1}, {5,6,1,7,4,3,9,8,2}, {9,7,8,6,3,2,1,5,4}, {6,1,2,5,8,4,7,3,9}, {4,5,3,1,7,9,2,6,8}, {8,2,6,4,1,7,5,9,3}, {7,3,5,9,2,8,4,1,6}, {1,4,9,3,5,6,8,2,7}};
+
+    //     SudokuSolver complete = new SudokuSolver(anotherCompleteBoard);
+    //     SudokuSolver test = new SudokuSolver(anotherBoard);
+    //     System.out.println(test);
+    //     System.out.println(test.solve());
+    //     // System.out.println(test.runAC3());
+    //     // System.out.println(test.constraints);
+    //     System.out.println(test);
+    //     System.out.println(complete);
+
+    //     // compare the two boards
+    //     for (int i = 0; i < test.size; i++) {
+    //         for (int j = 0; j < test.size; j++) {
+    //             if (test.board[i][j] != complete.board[i][j]) {
+    //                 System.out.println("Error at row " + i + " and column " + j);
+    //             }
+    //         }
+    //     }
+    // }
 }
